@@ -1,0 +1,44 @@
+{% extends 'rent_out.html' %}
+
+{% block title %}个人信息{% endblock %}
+
+{% block rent_in %}{% endblock %}
+{% block rent_out %}{% endblock %}
+
+{% block place %}个人信息{% endblock %}
+{% block title_h3 %}修改个人信息{% endblock %}
+
+{% block sub_content %}
+
+    <form class="f_input update_profile" method="post" action="/profile/" enctype="multipart/form-data">
+        <input type="text" onfocus="this.placeholder = '';" value="{{ locals["result"]["username"] }}"
+               onblur="if (this.value === '') {this.placeholder = '用户名';}" required="" placeholder="用户名" readonly>
+        <input name="password" type="password" onfocus="this.placeholder = '';"
+               maxlength="16" minlength="3"
+               onblur="if (this.value === '') {this.placeholder = '旧密码';}" required="" placeholder="旧密码">
+        <input name="re_password" type="password" onfocus="this.placeholder = '';"
+               maxlength="16" minlength="3"
+               onblur="if (this.value === '') {this.placeholder = '新密码';}" required="" placeholder="新密码">
+        <input name="phone" type="text" onfocus="this.placeholder = '';" value="{{ locals["result"]["phone"] }}"
+               maxlength="11" minlength="11"
+               onblur="if (this.value === '') {this.placeholder = '手机';}" required="" placeholder="手机">
+        <input name="email" type="email" onfocus="this.placeholder = '';" value="{{ locals["result"]["email"] }}"
+               onblur="if (this.value === '') {this.placeholder = '邮箱';}" required="" placeholder="邮箱">
+        <input type="submit" value="提交">
+    </form>
+{% endblock %}
+
+
+{% block js %}
+    <script>
+        $(".update_profile").ajaxForm(function (data) {
+            if (data === "ok") {
+                alert("修改成功！");
+            }
+            else {
+                alert(data);
+            }
+        });
+
+    </script>
+{% endblock %}

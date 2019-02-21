@@ -1,0 +1,74 @@
+{% extends 'index.html' %}
+
+{% block title %}出租{% endblock %}
+
+{% block rent_in %}{% endblock %}
+{% block rent_out %} class="active" {% endblock %}
+
+{% block content %}
+    <div class="coment-form">
+        <div class="container text-center">
+            <h4 class="text-left">House Rent / {% block place %}出租{% endblock %}</h4>
+            {% block title_h3 %}<h3>填写房屋信息</h3>{% endblock %}
+            {% block sub_content %}
+                <form class="f_input rent_out" method="post" action="/update_my_pub/" enctype="multipart/form-data">
+                {% if not locals['oid'] %}
+                    <div class="select_width">
+                        <div class="yourplace province_selector">
+                            <h5>省份</h5>
+                            <select class="sel2">
+                                <option value="">不限</option>
+                                {% for province in locals['provinces'] %}
+                                    <option value="{{ province['id'] }}">{{ province['name'] }}</option>
+                                {% endfor %}
+
+                            </select>
+                        </div>
+                        <div class="yourplace city_selector">
+                            <h5>城市</h5>
+                            <select class="sel2" name="city_id" required="">
+                                <option value="">---请选择省份---</option>
+                                {% for city in locals['cities'] %}
+                                    <option value="{{ city['id'] }}">{{ city['name'] }}</option>
+                                    <!--生成页面之后，就已经不存在了，局部刷新是无法使用到jinja的-->
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    {% else %}
+                    <input name="oid" value="{{ locals['oid'] }}" style="display: none;">
+                {% endif %}
+                    <input name="title" type="text" onfocus="this.placeholder = '';" value="{{ locals['the_house']['title'] }}"
+                           onblur="if (this.value === '') {this.placeholder = '标题';}" required="" placeholder="标题">
+                    <input name="room" type="text" onfocus="this.placeholder = '';" value="{{ locals['the_house']['room'] }}"
+                           onblur="if (this.value === '') {this.placeholder = '规格';}" required="" placeholder="规格">
+                    <input name="price" type="number" onfocus="this.placeholder = '';" value="{{ locals['the_house']['price'] }}"
+                           onblur="if (this.value === '') {this.placeholder = '租金/月';}" required="" placeholder="租金/月">
+                    <input name="loc" type="text" onfocus="this.placeholder = '';" value="{{ locals['the_house']['loc'] }}"
+                           onblur="if (this.value === '') {this.placeholder = '地址';}" required="" placeholder="地址">
+                    <input name="house_img" type="file" required="" accept="image/png,image/jpeg">
+                    <input type="submit" value="提交">
+                </form>
+                {% if locals['oid'] %}
+                    <button onclick='window.location.href="/my_pub/"' class="btn btn-dark">取消</button>
+                {% endif %}
+            {% endblock %}
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $(".rent_out").ajaxForm(function (data) {
+            if (data === "ok") {
+                alert("发布成功！");
+                window.location.href = '/my_rent_out'
+            }
+            else {
+                alert(data);
+            }
+        });
+
+    </script>
+{% endblock %}

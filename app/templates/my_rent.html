@@ -1,0 +1,129 @@
+{% extends 'rent_out.html' %}
+
+{% block title %}租赁信息{% endblock %}
+
+{% block rent_in %}{% endblock %}
+{% block rent_out %}{% endblock %}
+
+{% block place %}租赁信息{% endblock %}
+{% block title_h3 %}
+    {% if not locals["is_admin"] %}
+        <h3>{% if locals["flag"] %}我的发布{% else %}我的租房{% endif %}</h3>
+    {% else %}
+        <input type="text" placeholder="输入用户名" onkeydown="search_rented(event, this)"
+               style="width: 50%; background-color: #fff;padding: 8px;font-size: 20px;margin: 10px auto ">
+    {% endif %}
+{% endblock %}
+
+{% block sub_content %}
+    {% if locals["is_admin"] %}
+        <div class="col-md-12 idxpress-right">
+            <h4 class="text-left">共 {{ locals['count'] }}
+                条结果：</h4>
+            {% for h in locals['houses'] %}
+                <div class="idxpres-grids col-md-6">
+                    <div class="idxpres1 bg_white">
+                        <div class="idxpres-left">
+                            <a href="#"><img src="/static/house_img/{{ h['img_name'] }}.jpg"
+                                             onerror="javascript:this.src='/static/house_img/default.jpg';"
+                                             class="img-responsive" alt="/"></a>
+                        </div>
+                        <div class="idxpres-right">
+                            <h5>{{ h['title'] }}</h5>
+                            <div class="idxpresright-bottom">
+                                <ul class="bottom-left text-left">
+                                    <li>状态：{% if h['is_rent'] == 2 %}<span style="color: red">已出租</span>
+                                    {% elif h['is_rent'] == 1 %}<span style="color: orange">预约中</span>
+                                    {% else %}<span style="color: limegreen">可预约</span>
+                                    {% endif %}</li>
+                                    <li>规格：{{ h['room'] }}</li>
+                                    <li>地址：{{ h['loc'] }}</li>
+                                    <li>房东：{{ h['owner'] }} </li>
+                                </ul>
+                                <ul class="bottom-right text-right profile-left">
+                                    <li><h4 style="color: #FAA43D">{{ h['price'] }}元/月</h4></li>
+{#                                    <li>{{ h['renter'].split('^')[1] }}</li>#}
+                                    <li>&nbsp;</li>
+                                    <li>
+                                        <a href="/confirm_rent?oid={{ h['_id'] }}" class="btn btn-warning">确认</a>
+                                    </li>
+                                </ul>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="text-left">
+                {{ locals['pagination'].links }}
+            </div>
+        </div>
+    {% else %}
+        <div class="col-md-12 idxpress-right">
+            <h4 class="text-left">共 {{ locals['count'] }}
+                条结果：</h4>
+            {% for h in locals['houses'] %}
+                <div class="idxpres-grids col-md-6">
+                    <div class="idxpres1 bg_white">
+                        <div class="idxpres-left">
+                            <a href="#"><img src="/static/house_img/{{ h['img_name'] }}.jpg"
+                                             onerror="javascript:this.src='/static/house_img/default.jpg';"
+                                             class="img-responsive" alt="/"></a>
+                        </div>
+                        <div class="idxpres-right">
+                            <h5>{{ h['title'] }}</h5>
+                            <div class="idxpresright-bottom">
+                                <ul class="bottom-left text-left">
+                                    <li>状态：{% if h['is_rent'] == 2 %}<span style="color: red">已出租</span>
+                                    {% elif h['is_rent'] == 1 %}<span style="color: orange">预约中</span>
+                                    {% else %}<span style="color: limegreen">可预约</span>
+                                    {% endif %}</li>
+                                    <li>规格：{{ h['room'] }}</li>
+                                    <li>地址：{{ h['loc'] }}</li>
+                                    <li>房东：{{ h['owner'] }} </li>
+                                </ul>
+                                <ul class="bottom-right text-right profile-left">
+                                    <li><h4 style="color: #FAA43D">{{ h['price'] }}元/月</h4></li>
+                                    <li>&nbsp;</li>
+                                    <li>
+                                        {% if not locals["flag"] %}
+
+                                            <a href="/cancel_my_rent?oid={{ h['_id'] }}" class="btn btn-danger">取消</a>
+                                        {% else %}
+                                            <form action="/update_my_pub/" method="get">
+                                                <input style="display: none" name="oid"
+                                                       value="{{ h['_id'] }}">
+                                                <button class="btn btn-success">修改</button>
+                                            </form>
+                                        {% endif %}
+                                    </li>
+                                </ul>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="text-left">
+                {{ locals['pagination'].links }}
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+
+{% block js %}
+    <script>
+        function search_rented(e, obj) {
+            if (e.keyCode === 13) {
+                var username = $(obj).val();
+                $.get("/house_admin?username=" + username, function (result) {
+
+                    window.location.href = "/house_admin?username=" + username
+                })
+            }
+        }
+    </script>
+{% endblock %}

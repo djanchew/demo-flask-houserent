@@ -1,0 +1,380 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>{% block title %}House Rent{% endblock %}</title>
+    <!---css--->
+    <link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel='stylesheet' type='text/css'/>
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel='stylesheet' type='text/css'/>
+    <!---css--->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+</head>
+<body>
+
+<!---header--->
+<div class="header-section">
+    <div class="container">
+        <nav class="navbar navbar-default">
+            <!---Brand and toggle get grouped for better mobile display--->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <div class="navbar-brand">
+                    <h1><a><span>House </span>Rent</a></h1>
+                </div>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse float-right" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav pull-right">
+                    <li {% block rent_in %} class="active"{% endblock %}><a href="/">租房</a></li>
+                    <li {% block rent_out %}{% endblock %}><a href="" onclick="rent_out()">发布</a></li>
+                    {% if locals['current_user'] %}
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-haspopup="true"
+                               aria-expanded="false" style="color: cornflowerblue">
+                                {{ locals['current_user'] }}
+                                <span class="caret"></span></a>
+                            <ul class="dropdown-menu sub_li">
+                                <li><a href="/profile">个人信息</a></li>
+                                <li><a href="/my_rent">我的租房</a></li>
+                                <li><a href="/my_pub">我的发布</a></li>
+
+                                {% if locals['current_user'] == "root" %}
+                                    <li><a href="/user_admin"># 用户管理</a></li>
+                                    <li><a href="/house_admin"># 租房管理</a></li>
+
+                                {% endif %}
+
+                                <li><a href="/logout"><i class="glyphicon glyphicon-log-out"
+                                                         aria-hidden="true">登出</i></a></li>
+                            </ul>
+                        </li>
+
+                    {% else %}
+                        <li><a href="#" data-toggle="modal" data-target="#myModal">
+                            <i class="glyphicon glyphicon-log-in" aria-hidden="true"></i> 登录</a></li>
+                        <li><a href="#" data-toggle="modal" data-target="#myModal1">
+                            <i class="glyphicon glyphicon-book" aria-hidden="true"></i> 注册</a></li>
+                    {% endif %}
+
+                </ul>
+                {#							<div class="clearfix"></div>#}
+            </div>
+        </nav>
+    </div>
+</div>
+
+<div class="content">
+    {% block content %}
+        <div class="idxpress-section">
+            <div class="container">
+                <div class="idxpress-grids">
+                    <div class="col-md-3 idxpress-left">
+                        <div class="properties-top search1">
+                            <a href="#" style="text-decoration: none"><h4>搜索</h4></a>
+                            <div class="yourplace province_selector">
+                                <h5>省份</h5>
+                                <select class="sel2">
+                                    <option value="">不限</option>
+                                    {% for province in locals['provinces'] %}
+                                        <option value="{{ province['id'] }}">{{ province['name'] }}</option>
+                                    {% endfor %}
+
+                                </select>
+                            </div>
+                            <div class="yourplace city_selector">
+                                <h5>城市</h5>
+                                <select class="sel2">
+                                    <option value="">---请选择省份---</option>
+                                    {% for city in locals['cities'] %}
+                                        <option value="{{ city['id'] }}">{{ city['name'] }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="yourplace is_rent">
+                                <h5>状态</h5>
+                                <select class="sel2">
+                                    <option value="">不限</option>
+                                    <option value="0">未出租</option>
+                                    <option value="1">预约中</option>
+                                    <option value="2">已出租</option>
+                                    、
+                                </select>
+                            </div>
+                            <div class="yourplace price">
+                                <h5>租金/月</h5>
+                                <select class="sel2">
+                                    <option value="">不限</option>
+                                    <option value="0-1000">1000元 以下</option>
+                                    {% for money in range(0,7) %}
+                                        <option value="{{ loop.index * 1000 }}-{{ (loop.index + 1)  * 1000 }}">{{ loop.index * 1000 }}
+                                            - {{ (loop.index + 1)  * 1000 }} 元
+                                        </option>
+                                    {% endfor %}
+                                    <option value="8000-999999">8000元 以上</option>
+                                </select>
+                            </div>
+                            <div> &nbsp;</div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-9 idxpress-right">
+                        <h3>{{ locals['city_name'] }} 共 {{ locals['count'] }}
+                            条结果： {{ locals['price'] }} {{ locals['is_rent'] }}</h3>
+                        {% for h in locals['houses'] %}
+                            <div class="idxpres-grids">
+                                <div class="idxpres1 bg_white">
+                                    <div class="idxpres-left">
+                                        <a href="#"><img src="static/house_img/{{ h['img_name'] }}.jpg"
+                                                         onerror="javascript:this.src='static/house_img/default.jpg';"
+                                                         class="img-responsive" alt="/"></a>
+                                    </div>
+                                    <div class="idxpres-right">
+                                        <h5>{{ h['title'] }}</h5>
+                                        <div class="idxpresright-bottom">
+                                            <ul class="bottom-left">
+                                                <li>状态：{% if h['is_rent'] == 2 %}<span style="color: red">已出租</span>
+                                                {% elif h['is_rent'] == 1 %}<span style="color: orange">预约中</span>
+                                                {% else %}<span style="color: limegreen">可预约</span>
+                                                {% endif %}</li>
+                                                <li>规格：{{ h['room'] }}</li>
+                                                <li>地址：{{ h['loc'] }}</li>
+                                                <li>房东：{{ h['owner'] }} </li>
+                                            </ul>
+                                            <ul class="bottom-right text-right profile-left">
+                                                <li><h4 style="color: #FAA43D">{{ h['price'] }}元/月</h4></li>
+                                                <li>&nbsp;</li>
+                                                {% if not h['is_rent'] %}
+
+                                                    <li>
+                                                        <form action="/rent_book/" method="post" class="book_form">
+                                                            <input style="display: none" name="oid"
+                                                                   value="{{ h['_id'] }}">
+                                                            <button class="btn btn-warning">预约</button>
+                                                        </form>
+                                                    </li>
+                                                {% endif %}
+                                            </ul>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        <div class="text-right">
+                            {{ locals['pagination'].links }}
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+
+    {% endblock %}
+    <!-- 登录注册表单 -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content modal-info">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body real-spa">
+                    <div class="login-grids">
+                        <div class="login">
+
+                            <div class="login-right">
+                                <form action="/login/" method="post" class="login_form" autocomplete="off">
+                                    <h3>登录</h3>
+                                    <input type="text" name="account" onfocus="this.placeholder = '';"
+                                           onblur="if (this.value === '') {this.placeholder = '手机/邮箱';}" required=""
+                                           placeholder="用户名">
+                                    <input type="password" name="password" onfocus="this.placeholder = '';"
+                                           onblur="if (this.value === '') {this.placeholder = '密码';}" required=""
+                                           placeholder="密码">
+
+                                    <div class="single-bottom pt-2">
+                                        <input type="checkbox" id="brand" name="remember_me" value="1">
+                                        <label for="brand"><span></span>记住我</label>
+                                        <a onclick="forget_pwd()">忘记密码</a>
+                                    </div>
+                                    <input type="submit" value="确定">
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- //login -->
+    <!-- Register -->
+    <div class="modal fade" id="myModal1" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content modal-info">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body real-spa">
+                    <div class="login-grids">
+                        <div class="login">
+                            <div class="login-right">
+                                <form action="/register/" method="post" class="register_form" autocomplete="off">
+                                    <h3>注册 </h3>
+                                    <input type="text" name="username" onfocus="this.placeholder = '';"
+                                           onblur="if (this.value === '') {this.placeholder = '用户名';}" required=""
+                                           maxlength="20" minlength="1"
+                                           placeholder="用户名">
+                                    <input type="text" name="phone" onfocus="this.placeholder = '';"
+                                           onblur="if (this.value === '') {this.placeholder = '手机';}" required=""
+                                           maxlength="11" minlength="11"
+                                           placeholder="手机">
+                                    <input type="text" name="email" onfocus="this.placeholder = '';"
+                                           onblur="if (this.value === '') {this.placeholder = '邮箱';}" required=""
+                                           placeholder="邮箱">
+                                    <input type="password" name="password" onfocus="this.placeholder = '';"
+                                           onblur="if (this.value === '' ) {this.placeholder = '密码';}" required=""
+                                           maxlength="16" minlength="3"
+                                           placeholder="密码">
+                                    <input type="password" name="re_password"
+                                           onfocus="this.placeholder = '';"
+                                           maxlength="16" minlength="3"
+                                           onblur="if (this.value === '') {this.placeholder = '确认密码';}" required=""
+                                           placeholder="确认密码">
+
+                                    <input type="submit" value="确定">
+                                </form>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        {#								<p>By logging in you agree to our <a href="#">Terms</a> and <a href="#">Conditions</a> and <a href="#">Privacy Policy</a></p>#}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- //Register -->
+    <!-- //登录注册表单 -->
+    <!---js--->
+    <script src="{{ url_for('static', filename='js/jquery-1.11.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.form.js') }}"></script>
+    <script type="application/x-javascript"> addEventListener("load", function () {
+        setTimeout(hideURLbar, 0);
+    }, false);
+
+    function hideURLbar() {
+        window.scrollTo(0, 1);
+    } </script>
+    <script>
+        function forget_pwd() {
+            var username = prompt("请输入用户名");
+            var account = prompt("请输入您的手机或邮箱");
+            $.post("/forget_pwd/", {account: account, username: username}, function (result) {
+                if (result === "ok") {
+                    alert("密码已重置为：123456")
+                }
+                else {
+                    alert(result)
+                }
+            });
+        }
+
+        function rent_out() {
+            $.get("/rent_out/", function (result) {
+                if (result === "error") {
+                    alert("当前未登录")
+                }
+                else {
+                    window.location.href = "/rent_out/"
+                }
+            });
+        }
+
+        $(function () {
+            $(".login_form").ajaxForm(function (data) {
+                if (data === "ok") {
+                    alert("登录成功！");
+                    window.location.href = '/'
+                }
+                else if (data === "error") {
+                    alert("密码错误！");
+                }
+                else {
+                    alert("用户名不存在！");
+                }
+            });
+
+            $(".register_form").ajaxForm(function (data) {
+                if (data === "ok") {
+                    alert("注册成功！");
+                    window.location.href = '/'
+                }
+                else if (data === "exist") {
+                    alert("用户名已存在！");
+                }
+                else {
+                    alert(data);
+                }
+            });
+
+            $(".book_form").ajaxForm(function (data) {
+                if (data === "ok") {
+                    alert("预约成功！请在48小时内到店确认");
+                    window.location.reload()
+                }
+                else if (data === "exist") {
+                    alert("该房已被预约！");
+                }
+                else {
+                    alert("当前未登录");
+                }
+            });
+
+            $(".province_selector").change(function () {
+                var the_id = $(this).find("option:selected").val();
+                if (the_id > 0) {
+                    $.post("/get_city/", {id: the_id}, function (result) {
+                        {#$(".city_selector").load(location.href+" .city_selector");#}
+                        var data = eval('(' + result + ')');
+                        var city_selector = $(".city_selector select");
+                        console.log(data);
+                        city_selector.empty();
+                        {#city_selector.append("<option value=''>不限</option>");#}
+                        $.each(data, function (index, value) {
+                            city_selector.append("<option value='" + value['id'] + "'>" + value['name'] + "</option>");
+                        });
+
+                    });
+                }
+                else {
+                    $(".city_selector select").empty().append("<option value='0'>---请选择省份---</option>");
+                }
+
+            });
+
+            $(".search1 a").on('click', function () {
+                window.location.href = '/?'
+                    + 'city_id=' + $(".city_selector select").val()
+                    + '&price=' + $(".price select").val()
+                    + '&is_rent=' + $(".is_rent select").val();
+            });
+        });
+    </script>
+    {% block js %}
+    {% endblock %}
+    <!---js--->
+</body>
+</html>
